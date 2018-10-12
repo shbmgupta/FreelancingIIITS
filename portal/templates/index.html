@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<center>
+    <a href="{% url 'Portal:index' %}">Home</a><br><br><br>
+    <a href="{% url 'Portal:browse_jobs' %}">Browse Jobs</a>&emsp;&emsp;
+    <a href="{% url 'Portal:post_project' %}">Post Project</a>
+    <br><br><br>
+    <a href="{% url 'Portal:browse_jobs' %}"><input type="button" value="I want to work"></a>&emsp;&emsp;<a
+        href="{% url 'Portal:post_project' %}"><input type="button" value="I want to hire"></a>
+</center>
+</body>
+</html>

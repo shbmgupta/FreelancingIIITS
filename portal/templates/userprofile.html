@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{{user.id}}</title>
+</head>
+<body>
+<img src="{{user.image}}"><br/>
+{{user.id}}<br/>
+{{user.username}}<br/>
+{{user.email}}<br/>
+{{user.bio}}<br/>
+{{user.phone_number}}<br/>
+{{user.batchYear}}<br/>
+{{user.gender}}<br/>
+------------------------------------<br/>
+{% for i in users_skills %}
+	{{i.skill.skill_name}} {{i.level_of_proficiency}} <br/>
+{% endfor %}
+------------------------------------<br/>
+{% for i in users_languages %}
+	{{i.language.language_name}} {{i.level_of_fluency}} <br/>
+{% endfor %}
+</body>
+</html>
