@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+        Welcome {{request.user.username}}<br>
+    <a href="{% url 'Portal:logout' %}"><input type="button" value="Logout"></a><br>
+    <a href="{% url 'Portal:post_project' %}"><input type="button" value="Post"></a><br>
+</body>
+</html>

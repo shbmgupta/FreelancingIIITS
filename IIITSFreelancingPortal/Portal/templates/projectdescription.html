@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Description</title>
+</head>
+<body>
+<center>
+    <h1>Posted By - {{request.user.username}}</h1>
+    {% for project in project_list %}
+        <h4><b>Project Name:</b></h4><br>
+        {{project.project_name}}<br>
+        <h4><b>Project Description:</b></h4><br>
+        {{project.description}}<br>
+        <h4><b>Posted on:</b></h4><br>
+        {{project.postedOn}}<br>
+        <h4><b>Tasks:</b></h4><br>
+        {{project.task_count}}<br>
+        <h4><b>Deadline:</b></h4><br>
+        {{project.deadline}}<br>
+    {% endfor %}
+
+</center>
+
+{% for task in task_list %}
+<p></p>
+<h4><b>Task Name:</b></h4><br>
+<a href="{% url 'Portal:tasks_description' project.id task.id %}">{{task.task_name}}</a><br>
+<h4><b>Posted on:</b></h4><br>
+{{task.addedOn}}<br>
+<p></p>
+{% endfor %}
+
+</body>
+</html>

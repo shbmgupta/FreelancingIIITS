@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+</head>
+<body>
+    <form method="post" action="{% url 'Portal:signup' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        Username:
+        <input name="name"><br>
+        First name:
+        <input name="fname"><br>
+        Last name:
+        <input name="lname"><br>
+        Email
+        <input type="email" name="email"><br>
+        Password
+        <input type="password" name="passwd"><br>
+        Phone Number
+        <input type="number" name="phno"><br>
+        Bio
+        <textarea name="bio"></textarea><br>
+        Batch
+        <select name="batch">
+            <option value="UG-1" selected>UnderGraduate 1st year</option>
+            <option value="UG-2">UnderGraduate 2nd year</option>
+            <option value="UG-3">UnderGraduate 3rd year</option>
+            <option value="UG-4">UnderGraduate 4th year</option>
+            <option value="MS">MS</option>
+            <option value="Ph.D">Ph.D</option>
+        </select><br>
+        Gender
+        <select name="gender">
+            <option value="Male" selected>Male</option>
+            <option value="Female">Female</option>
+        </select><br>
+        Profile Photo
+        <input type="file" name="image"><br>
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
