@@ -2,15 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Post Project</title>
+    <title>Add Task</title>
 </head>
 <body>
-    <form method="post">
+    <form method="post" action="{% url 'Portal:add_task' project_id %}">
         {% csrf_token %}
-        Name of the Project
+        Name of the Task
         <input name="name"><br>
         Description
         <textarea name="desc"></textarea><br>
+        Credits
+        <input name="credit"><br>
         Deadline
         <input name="deadline" type="date"/><br>
         <input type="submit" value="POST">

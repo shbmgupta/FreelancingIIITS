@@ -1,12 +1,13 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.shortcuts import render, reverse, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.shortcuts import render, reverse, redirect
+
 from .models import *
 
 
 # Create your views here.
 def index(request):
-    return HttpResponse('Welcome to IIITS Freelancing Portal')
+    return render(request, 'index.html')
 
 
 def signup_user(request):
@@ -39,7 +40,11 @@ def signup_user(request):
 
 def home(request):
     if request.user.is_authenticated:
-        return render(request, 'home.html')
+        context = dict()
+        cuser = CustomUser.objects.get(user=request.user.id)
+        posted_projects = Project.objects.filter(leader=cuser.id)
+        context['posted_projects'] = posted_projects
+        return render(request, 'home.html', context)
 
 
 def login_user(request):
@@ -66,18 +71,42 @@ def post_project(request):
             project.leader = CustomUser.objects.get(user=request.user.id)
             project.deadline = request.POST['deadline']
             project.save()
-            project_list = Project.objects.filter(leader=project.leader)
+            posted_projects = Project.objects.filter(leader=project.leader)
             context = dict()
-            context['project_list'] = project_list
-            return render(request, 'projectdescription.html', context)
+            context['posted_projects'] = posted_projects
+            return render(request, 'home.html', context)
         return render(request, 'login.html')
     return render(request, "postproject.html")
 
 
-def project_description(request):
-    cuser = CustomUser.objects.get(user=request.user.id)
-    project_list = Project.objects.filter(leader=cuser.id)
-    print(project_list)
+def project_description(request, project_id):
+    project = Project.objects.get(id=project_id)
+    added_tasks = Task.objects.filter(project=project.id)
     context = dict()
-    context['project_list'] = project_list
+    context['project'] = project
+    context['added_tasks'] = added_tasks
     return render(request, 'projectdescription.html', context)
+
+
+def add_task(request, project_id):
+    context = {}
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            task = Task()
+            task.task_name = request.POST['name']
+            task.task_description = request.POST['desc']
+            task.credits = request.POST['credit']
+            task.deadline = request.POST['deadline']
+            task.project = Project.objects.get(id=project_id)
+            task.save()
+            return redirect('Portal:project_description', project_id)
+        return render(request, 'login.html')
+    context['project_id'] = project_id
+    return render(request, "addtask.html", context)
+
+
+def task_description(request, project_id, task_id):
+    task = Task.objects.filter(id=task_id, project=project_id)
+    context = dict()
+    context['task'] = task
+    return render(request, 'taskdescription.html', context)

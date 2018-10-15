@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 # Create your models here.
 
 Beginner = Good = 1
@@ -95,7 +96,7 @@ class UsersCommunicationLanguage(models.Model):
 class Project(models.Model):
     project_name = models.CharField(max_length=30, blank=False)
     description = models.CharField(max_length=100, default=None)
-    postedOn = models.DateTimeField(auto_now_add=True, blank=False)
+    postedOn = models.DateTimeField(default=datetime.datetime.now(), blank=False)
     leader = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     isCompleted = models.BooleanField(default=False)
     deadline = models.DateField(blank=False)
@@ -107,7 +108,7 @@ class Project(models.Model):
 
 class Task(models.Model):
     task_name = models.CharField(max_length=30, blank=False)
-    addedOn = models.DateTimeField(auto_now_add=True, blank=False)
+    addedOn = models.DateTimeField(default=datetime.datetime.now(), blank=False)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     credits = models.CharField(max_length=20, blank=False)
     task_description = models.CharField(max_length=100, default=None)
@@ -133,7 +134,7 @@ class TaskSkillsRequired(models.Model):
 class Applicant(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    time_of_application = models.DateTimeField(auto_now_add=True)
+    time_of_application = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return str(self.user.username) + '[id=' + str(self.user.id) + ']'
@@ -143,7 +144,7 @@ class Contributor(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     isCreditVerified = models.BooleanField(default=False)
-    time_of_selection = models.DateTimeField(auto_now_add=True)
+    time_of_selection = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return str(self.user.username) + '[id=' + str(self.user.id) + ']'
@@ -152,7 +153,7 @@ class Contributor(models.Model):
 class HoursOfWork(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(default=None)
     end_time = models.DateTimeField(blank=True, default=None)
 
     def __str__(self):
@@ -194,7 +195,7 @@ class Notification(models.Model):
     _to = models.ForeignKey(CustomUser, related_name='_from', on_delete=models.CASCADE)
     message = models.CharField(default=None, max_length=300)
     hasRead = models.BooleanField(default=False)
-    receivingTime = models.DateTimeField(blank=False)
+    receivingTime = models.DateTimeField(default=datetime.datetime.now(), blank=False)
 
 
 
