@@ -5,17 +5,21 @@
     <title>Add Task</title>
 </head>
 <body>
-    <form method="post" action="{% url 'Portal:add_task' project_id %}">
-        {% csrf_token %}
-        Name of the Task
-        <input name="name" required><br>
-        Description
-        <textarea name="desc" required></textarea><br>
-        Credits
-        <input name="credit" required><br>
-        Deadline
-        <input name="deadline" type="date" required><br>
-        <input type="submit" value="ADD">
-    </form>
+<form method="post" action="{% url 'Portal:add_task' project_id %}">
+    {% csrf_token %}
+    Name of the Task
+    <input name="name" required><br>
+    Description
+    <textarea name="desc" required></textarea><br>
+    Credits
+    <input name="credit" required><br>
+    Deadline
+    <input name="deadline" type="date" required><br>
+    Skills Required<br>
+    {% for skill in skill_list %}
+    {{skill.skill_name}}<input type="checkbox" name="skills[]" value="{{skill.skill_name}}"><br>
+    {% endfor %}
+    <input type="submit" value="ADD">
+</form>
 </body>
 </html>

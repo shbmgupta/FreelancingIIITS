@@ -11,6 +11,7 @@ def index(request):
 
 
 def signup_user(request):
+    context = dict()
     if request.method == 'POST':
         username = request.POST['name']
         first_name = request.POST['fname']
@@ -22,6 +23,8 @@ def signup_user(request):
         image = request.FILES['image']
         batchYear = request.POST['batch']
         gender = request.POST['gender']
+        skills = request.POST.getlist('skills')
+        languages = request.POST.getlist('languages')
         try:
             if User.objects.get(email=email):
                 context = dict()
@@ -34,9 +37,31 @@ def signup_user(request):
                                gender=gender)
             user.save()
             cuser.save()
+            for uskill in skills:
+                skill = Skill.objects.get(skill_name=uskill)
+                skill.skill_name = uskill
+                skill.save()
+                cuskill = UsersSkill()
+                cuskill.skill = skill
+                cuskill.user = cuser
+                cuskill.level_of_proficiency = request.POST[skill.skill_name]
+                cuskill.save()
+            for ulanguage in languages:
+                language = CommunicationLanguage.objects.get(language_name=ulanguage)
+                language.language_name = ulanguage
+                language.save()
+                culanguage = UsersCommunicationLanguage()
+                culanguage.language = language
+                culanguage.user = cuser
+                culanguage.level_of_fluency = request.POST[language.language_name]
+                culanguage.save()
             login(request, user)
             return request(request, 'home.html')
-    return render(request, 'signup.html')
+    skill_list = Skill.objects.all()
+    language_list = CommunicationLanguage.objects.all()
+    context['skill_list'] = skill_list
+    context['language_list'] = language_list
+    return render(request, 'signup.html', context)
 
 
 def home(request):
@@ -104,11 +129,20 @@ def add_task(request, project_id):
             task.task_description = request.POST['desc']
             task.credits = request.POST['credit']
             task.deadline = request.POST['deadline']
+            skills = request.POST.getlist('skills')
             task.project = Project.objects.get(id=project_id)
             task.save()
+            for rskill in skills:
+                skill = Skill.objects.get(skill_name=rskill)
+                task_skill_req = TaskSkillsRequired()
+                task_skill_req.task = task
+                task_skill_req.skill = skill
+                task_skill_req.save()
             return redirect('Portal:project_description', project_id)
         return render(request, 'login.html')
     context['project_id'] = project_id
+    skill_list = Skill.objects.all()
+    context['skill_list'] = skill_list
     return render(request, "addtask.html", context)
 
 

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jobs</title>
+</head>
+<body>
+    <form method="post">
+        <b>Skills:</b><br>
+        {% for skill in skill_list %}
+        <input type="checkbox" value="skill_{{skill.skill_name}}"><br>
+        {% endfor %}
+        <b>Languages</b><br>
+        {% for language in language_list %}
+        <input type="checkbox" value="language_{{language.language_name}}"><br>
+        {% endfor %}
+        <input type="submit" value="Filter">
+    </form>
+</body>
+</html>

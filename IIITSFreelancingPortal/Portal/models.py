@@ -71,7 +71,7 @@ class UsersSkill(models.Model):
     )
 
     def __str__(self):
-        return str(self.user.username) + "/" + str(self.skill.skill_name) + "/" + str(self.level_of_proficiency)
+        return str(self.user.user.username) + "/" + str(self.skill.skill_name) + "/" + str(self.level_of_proficiency)
 
 
 class CommunicationLanguage(models.Model):
@@ -90,7 +90,7 @@ class UsersCommunicationLanguage(models.Model):
     )
 
     def __str__(self):
-        return str(self.user.username) + "/" + str(self.language.language_name) + "/" + str(self.level_of_fluency)
+        return str(self.user.user.username) + "/" + str(self.language.language_name) + "/" + str(self.level_of_fluency)
 
 
 class Project(models.Model):
@@ -137,7 +137,7 @@ class Applicant(models.Model):
     time_of_application = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
-        return str(self.user.username) + '[id=' + str(self.user.id) + ']'
+        return str(self.user.user.username) + '[id=' + str(self.user.id) + ']'
 
 
 class Contributor(models.Model):
@@ -147,7 +147,7 @@ class Contributor(models.Model):
     time_of_selection = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
-        return str(self.user.username) + '[id=' + str(self.user.id) + ']'
+        return str(self.user.user.username) + '[id=' + str(self.user.id) + ']'
 
 
 class HoursOfWork(models.Model):
@@ -157,7 +157,7 @@ class HoursOfWork(models.Model):
     end_time = models.DateTimeField(blank=True, default=None)
 
     def __str__(self):
-        return str(self.user.username) + '[id=' + str(self.user.id) + ']'
+        return str(self.user.user.username) + '[id=' + str(self.user.id) + ']'
 
 
 class TaskRating(models.Model):
@@ -171,7 +171,7 @@ class TaskRating(models.Model):
     )
 
     def __str__(self):
-        return str(self.user.username) + '[id=' + str(self.user.id) + ']'
+        return str(self.user.user.username) + '[id=' + str(self.user.id) + ']'
 
 
 class UserRating(models.Model):
@@ -187,7 +187,7 @@ class UserRating(models.Model):
     )
 
     def __str__(self):
-        return str(self.rating_by.username) + '[id=' + str(self.rating_by.id) + ']'
+        return str(self.rating_by.user.username) + '[id=' + str(self.rating_by.id) + ']'
 
 
 class Notification(models.Model):

@@ -3,44 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <title>Signup</title>
+    <style>
+        .sides{
+        margin:0;
+        }
+        .left{
+        float:left;
+        width:35%;
+        overflow:hidden;
+        }
+        .right{
+        float:left;
+        width:35%;
+        overflow:hidden;
+        }
+
+
+
+
+
+
+
+    </style>
 </head>
 <body>
 
-    {% if error_message %}
-    <b>{{error_message}}</b><br>
-    <form method="post" action="{% url 'Portal:signup' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        Username:
-        <input name="name" required><br>
-        First name:
-        <input name="fname" required><br>
-        Last name:
-        <input name="lname" required><br>
-        Email
-        <input type="email" name="email" required><br>
-        Password
-        <input type="password" name="passwd" minlength="8" required><br>
-        Phone Number
-        <input type="number" name="phno" minlength="10" maxlength="10" required><br>
-        Bio
-        <textarea name="bio" required></textarea><br>
-        Batch
-        <select name="batch">
-            <option value="UG-1" selected>UnderGraduate 1st year</option>
-            <option value="UG-2">UnderGraduate 2nd year</option>
-            <option value="UG-3">UnderGraduate 3rd year</option>
-            <option value="UG-4">UnderGraduate 4th year</option>
-            <option value="MS">MS</option>
-            <option value="Ph.D">Ph.D</option>
+{% if error_message %}
+<b>{{error_message}}</b><br>
+{% endif %}
+<form method="post" action="{% url 'Portal:signup' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    Username:
+    <input name="name" required><br>
+
+    First name:
+    <input name="fname" required><br>
+
+    Last name:
+    <input name="lname" required><br>
+
+    Email:
+    <input type="email" name="email" required><br>
+
+    Password:
+    <input type="password" name="passwd" minlength="8" required><br>
+
+    Phone Number:
+    <input type="number" name="phno" minlength="10" maxlength="10" required><br>
+
+    Bio:
+    <textarea name="bio" required></textarea><br>
+
+    Batch:
+    <select name="batch">
+        <option value="UG-1" selected>UnderGraduate 1st year</option>
+        <option value="UG-2">UnderGraduate 2nd year</option>
+        <option value="UG-3">UnderGraduate 3rd year</option>
+        <option value="UG-4">UnderGraduate 4th year</option>
+        <option value="MS">MS</option>
+        <option value="Ph.D">Ph.D</option>
+    </select><br>
+
+    Gender:
+    <select name="gender">
+        <option value="Male" selected>Male</option>
+        <option value="Female">Female</option>
+    </select><br>
+
+    <div class="sides left">
+        Skills:<br>
+        {% for skill in skill_list %}
+        {{skill.skill_name}}<input type="checkbox" name="skills[]" value="{{skill.skill_name}}"><br>
+        {% endfor %}
+
+        <br><br>
+
+        Languages:<br>
+        {% for language in language_list %}
+        {{language.language_name}}<input type="checkbox" name="languages[]" value="{{language.language_name}}"><br>
+        {% endfor %}
+    </div>
+    <div class="sides right">
+        Proficiency:<br>
+        {% for skill in skill_list %}
+        <select name="{{skill.skill_name}}">
+            <option value="Beginner" selected>Beginner</option>&emsp;
+            <option value="Intermediate">Intermediate</option>&emsp;
+            <option value="Advanced">Advanced</option>
         </select><br>
-        Gender
-        <select name="gender">
-            <option value="Male" selected>Male</option>
-            <option value="Female">Female</option>
+        {% endfor %}
+
+        <br><br><br>
+
+        Fluency:<br>
+        {% for language in language_list %}
+        <select name="{{skill.skill_name}}">
+            <option value="Good" selected>Good</option>&emsp;
+            <option value="VeryGood">VeryGood</option>&emsp;
+            <option value="Excellent">Excellent</option>
         </select><br>
-        Profile Photo
-        <input type="file" name="image" required><br>
-        <input type="submit" value="Register">
-    </form>
+        {% endfor %}
+    </div>
+    <br>
+
+    Profile Photo:
+    <input type="file" name="image" required><br>
+    <input type="submit" value="Register">
+</form>
 </body>
 </html>
