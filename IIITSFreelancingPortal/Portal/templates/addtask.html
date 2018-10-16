@@ -8,14 +8,14 @@
     <form method="post" action="{% url 'Portal:add_task' project_id %}">
         {% csrf_token %}
         Name of the Task
-        <input name="name"><br>
+        <input name="name" required><br>
         Description
-        <textarea name="desc"></textarea><br>
+        <textarea name="desc" required></textarea><br>
         Credits
-        <input name="credit"><br>
+        <input name="credit" required><br>
         Deadline
-        <input name="deadline" type="date"/><br>
-        <input type="submit" value="POST">
+        <input name="deadline" type="date" required><br>
+        <input type="submit" value="ADD">
     </form>
 </body>
 </html>

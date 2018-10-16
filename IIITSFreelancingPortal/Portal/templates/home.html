@@ -3,23 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <style>
+        .sides{
+        margin:0;
+        }
+        .left{
+        float:left;
+        width:75%;
+        overflow:hidden;
+        }
+        .right{
+        float:left;
+        width:25%;
+        overflow:hidden;
+        }
+    </style>
 </head>
 <body>
 Welcome {{request.user.username}}<br>
 <a href="{% url 'Portal:logout' %}"><input type="button" value="Logout"></a><br>
 <a href="{% url 'Portal:post_project' %}"><input type="button" value="Post"></a><br>
 
-{% if posted_projects %}
-<h4>Posted Projects</h4>
+<div class="sides left">
+    {% if posted_projects %}
+    <h4>Posted Projects</h4>
 
     {% for project in posted_projects %}
-        <p></p>
-        <h5><b>Project Name:</b></h5><br>
-        <a href="{% url 'Portal:project_description' project.id %}">{{project.project_name}}</a><br>
-        <h5><b>Project Description:</b></h5><br>
-        {{project.description}}<br>
-        <p></p>
+    <p></p>
+    <h5><b>Project Name:</b></h5><br>
+    <a href="{% url 'Portal:project_description' project.id %}">{{project.project_name}}</a><br>
+    <h5><b>Project Description:</b></h5><br>
+    {{project.description}}<br>
+    <p></p>
     {% endfor %}
-{% endif %}
+
+    {% else %}
+    <p> No Posted Projects</p>
+    {% endif %}
+</div>
+
+<div class="sides right">
+    {% if applicable_projects %}
+    <h4>Applicable Projects</h4>
+    {% for project in applicable_projects %}
+    <p></p>
+    <h5><b>Project Name:</b></h5><br>
+    <a href="{% url 'Portal:project_description' project.id %}">{{project.project_name}}</a><br>
+    <h5><b>Project Description:</b></h5><br>
+    {{project.description}}<br>
+    <p></p>
+    {% endfor %}
+    {% else %}
+    <p> No Applicable Projects</p>
+    {% endif %}
+</div>
+
 </body>
 </html>

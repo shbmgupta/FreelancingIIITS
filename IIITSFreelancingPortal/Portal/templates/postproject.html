@@ -8,11 +8,11 @@
     <form method="post">
         {% csrf_token %}
         Name of the Project
-        <input name="name"><br>
+        <input name="name" required><br>
         Description
-        <textarea name="desc"></textarea><br>
+        <textarea name="desc" required></textarea><br>
         Deadline
-        <input name="deadline" type="date"/><br>
+        <input name="deadline" type="date" required><br>
         <input type="submit" value="POST">
     </form>
 </body>

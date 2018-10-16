@@ -34,16 +34,19 @@ def signup_user(request):
                                gender=gender)
             user.save()
             cuser.save()
-            return request(request, 'login.html')
+            login(request, user)
+            return request(request, 'home.html')
     return render(request, 'signup.html')
 
 
 def home(request):
-    if request.user.is_authenticated:
+    if not request.user.is_superuser and request.user.is_authenticated:
         context = dict()
         cuser = CustomUser.objects.get(user=request.user.id)
         posted_projects = Project.objects.filter(leader=cuser.id)
+        applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
         context['posted_projects'] = posted_projects
+        context['applicable_projects'] = applicable_projects
         return render(request, 'home.html', context)
 
 
@@ -52,8 +55,12 @@ def login_user(request):
         username = request.POST['name']
         password = request.POST['passwd']
         user = authenticate(request, username=username, password=password)
-        login(request, user)
-        return HttpResponsePermanentRedirect(reverse('Portal:home'))
+        if user:
+            login(request, user)
+            return HttpResponsePermanentRedirect(reverse('Portal:home'))
+        context = dict()
+        context['error_message'] = 'Username or password is incorrect'
+        return render(request, 'login.html', context)
     return render(request, 'login.html')
 
 
@@ -106,7 +113,7 @@ def add_task(request, project_id):
 
 
 def task_description(request, project_id, task_id):
-    task = Task.objects.filter(id=task_id, project=project_id)
+    task = Task.objects.get(id=task_id, project=project_id)
     context = dict()
     context['task'] = task
     return render(request, 'taskdescription.html', context)

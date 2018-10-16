@@ -8,9 +8,9 @@
 <form method="post" action="{% url 'Portal:login' %}">
     {% csrf_token %}
     Username:
-    <input name="name"><br>
+    <input name="name" required><br>
     Password
-    <input type="password" name="passwd"><br>
+    <input type="password" name="passwd" required><br>
     <input type="submit" value="Login">
 </form>
 </body>

@@ -5,22 +5,25 @@
     <title>Signup</title>
 </head>
 <body>
+
+    {% if error_message %}
+    <b>{{error_message}}</b><br>
     <form method="post" action="{% url 'Portal:signup' %}" enctype="multipart/form-data">
         {% csrf_token %}
         Username:
-        <input name="name"><br>
+        <input name="name" required><br>
         First name:
-        <input name="fname"><br>
+        <input name="fname" required><br>
         Last name:
-        <input name="lname"><br>
+        <input name="lname" required><br>
         Email
-        <input type="email" name="email"><br>
+        <input type="email" name="email" required><br>
         Password
-        <input type="password" name="passwd"><br>
+        <input type="password" name="passwd" minlength="8" required><br>
         Phone Number
-        <input type="number" name="phno"><br>
+        <input type="number" name="phno" minlength="10" maxlength="10" required><br>
         Bio
-        <textarea name="bio"></textarea><br>
+        <textarea name="bio" required></textarea><br>
         Batch
         <select name="batch">
             <option value="UG-1" selected>UnderGraduate 1st year</option>
@@ -36,7 +39,7 @@
             <option value="Female">Female</option>
         </select><br>
         Profile Photo
-        <input type="file" name="image"><br>
+        <input type="file" name="image" required><br>
         <input type="submit" value="Register">
     </form>
 </body>
