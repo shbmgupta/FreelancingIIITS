@@ -3,18 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <title>Jobs</title>
+    <style>
+        .sides{
+        margin:0;
+        }
+        .left{
+        float:left;
+        width:60%;
+        overflow:hidden;
+        }
+        .right{
+        float:left;
+        width:40%;
+        overflow:hidden;
+        }
+        a{
+        text-decoration:none;
+        }
+
+
+
+    </style>
 </head>
 <body>
-    <form method="post">
-        <b>Skills:</b><br>
-        {% for skill in skill_list %}
-        <input type="checkbox" value="skill_{{skill.skill_name}}"><br>
-        {% endfor %}
-        <b>Languages</b><br>
-        {% for language in language_list %}
-        <input type="checkbox" value="language_{{language.language_name}}"><br>
-        {% endfor %}
-        <input type="submit" value="Filter">
-    </form>
+<div class="sides left" style="width:25%">
+    <fieldset>
+        <legend>Filter</legend>
+        <div class="sides left">
+            <b>Skills:</b><br>
+            {% for skill in skill_list %}
+            {{skill.skill_name}}<input type="checkbox" name="skills[]" value="{{skill.skill_name}}"><br>
+            {% endfor %}
+        </div>
+        <div class="sides right">
+            <b>Languages</b><br>
+            {% for language in language_list %}
+            {{language.language_name}}<input type="checkbox" name="languages[]"
+                                             value="{{language.language_name}}"><br>
+            {% endfor %}
+        </div>
+    </fieldset>
+    <input type="button" value="Filter" onclick="filter()">
+</div>
+
+<div class="sides right" style="width:70%">
+{% include 'jobs.html' %}
+</div>
+
+<script>
+    function filter() {
+        window.alert('filter');
+        break;
+        var skills = $("input[name='skills[]']:checked").map(function () {
+                        return this.value;
+                    }).get();
+
+        var languages = $("input[name='languages[]']:checked").map(function () {
+                        return this.value;
+                    }).get();
+
+        if( skills.length>0 && languages.length>0) {
+            $.ajax({
+                type: "POST",
+                url: {% url 'Portal:jobs_update' %},
+                data: {'skills': skills,
+                       'languages': languages,
+                       'jobs': {{jobs}}
+                }
+            })
+            .done(function(data) {
+                $('#jobs').append(data);
+            });
+            }
+        }
+</script>
 </body>
 </html>

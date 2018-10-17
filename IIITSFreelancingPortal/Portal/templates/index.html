@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Landing Page</title>
+    <style>
+        a{
+        text-decoration:none;
+        }
+    </style>
 </head>
 <body>
 <p>Welcome to IIITS Freelancing Portal</p><br>
 <a href="{% url 'Portal:signup' %}"><input type='button' value='Signup'></a>
 <a href="{% url 'Portal:login' %}"><input type='button' value='Login'></a>
+
+<a href="{% url 'Portal:browse_jobs' %}"><input type='button' value='I want to work'></a>
 
 </body>
 </html>
