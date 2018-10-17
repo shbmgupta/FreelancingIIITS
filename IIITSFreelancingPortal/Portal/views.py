@@ -94,6 +94,50 @@ def logout_user(request):
     return HttpResponseRedirect(reverse('Portal:index'))
 
 
+def context_data(projects, tasks):
+    context = dict()
+    decontext = dict()
+    p_key = set()
+    for task in tasks:
+        key = str(task.project.id)
+        if key not in p_key:
+            decontext[key] = []
+            p_key.add(key)
+        decontext[key].append(task)
+    context['jobs'] = []
+    for project in projects:
+        context['jobs'] += [(project, decontext[str(project.id)])]
+    return context
+
+
+def jobs_update(request):
+    skills = request.POST['skills']
+    # languages = request.POST['languages']
+    jobs = request.POST['jobs']
+    filtered_tasks = []
+    for job in jobs:
+        tasks = job[1]
+        for task in tasks:
+            taskskreq = TaskSkillsRequired.objects.filter(task=task)
+            skill_list = [Skill.objects.get(id=obj.skill.id).skill_name for obj in taskskreq]
+            flag = sum([skill in skills for skill in skill_list])
+            if flag != 0:
+                filtered_tasks.append(task)
+    context = context_data(jobs[0], filtered_tasks)
+    return render(request, 'jobs.html', context)
+
+
+def browse_jobs(request):
+    projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
+    tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
+    context = context_data(projects, tasks)
+    skill_list = Skill.objects.all()
+    language_list = CommunicationLanguage.objects.all()
+    context['skill_list'] = skill_list
+    context['language_list'] = language_list
+    return render(request, 'browsejobs.html', context)
+
+
 def post_project(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
