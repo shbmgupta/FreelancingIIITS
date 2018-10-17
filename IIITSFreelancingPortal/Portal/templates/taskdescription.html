@@ -5,14 +5,35 @@
     <title>Task Description</title>
 </head>
 <body>
-<h4><b>Task Name:</b></h4><br>
+<b>Task Name:</b><br>
 {{task.task_name}}<br>
-<h4><b>Task Description:</b></h4><br>
+<b>Task Description:</b><br>
 {{task.task_description}}<br>
-<h4><b>Added on:</b></h4><br>
+<b>Added on:</b><br>
 {{task.addedOn}}<br>
-<h4><b>Deadline:</b></h4><br>
+<b>Deadline:</b><br>
 {{task.deadline}}<br>
 
+<b>Applicants:-</b><br>
+{% for i in applicants %}
+	{{i.user.user.username}}<br/>
+{% endfor %}
+{% if is_alloted %}
+	<b>Contributor:-</b><br>
+	{{contributor.user.user.username}}<br/>
+{% else %}
+	{% if has_applied %}
+		You have already applied for he task
+	{% else %}
+		<b>Open For Applicants</b>
+		{% if not is_leader %}
+			<form method="POST" action="{% url 'Portal:task_description' task.project.id task.id %}">
+				{% csrf_token %}
+				<input type="hidden" name="task_id" value="{{task.id}}">
+				<input type="submit" name="submit" value="Apply for the task"> 			
+			</form>
+		{% endif %}
+	{% endif %}
+{% endif %}
 </body>
 </html>

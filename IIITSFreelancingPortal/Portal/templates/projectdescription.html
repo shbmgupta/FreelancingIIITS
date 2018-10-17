@@ -4,27 +4,27 @@
     <title>Project Description</title>
 </head>
 <body>
-<h4><b>Project Name:</b></h4><br>
+<b>Project Name:</b>
 {{project.project_name}}<br>
-<h4><b>Project Description:</b></h4><br>
+<b>Project Description:</b>
 {{project.description}}<br>
-<h4><b>Posted on:</b></h4><br>
+<b>Posted on:</b>
 {{project.postedOn}}<br>
-<h4><b>Tasks:</b></h4><br>
+<b>Tasks:</b>
 {{project.task_count}}<br>
-<h4><b>Deadline:</b></h4><br>
+<b>Deadline:</b>
 {{project.deadline}}<br>
-
-<a href="{% url 'Portal:add_task' project.id %}"><input type="button" value="Add Task"></a>
+{% if is_leader %}
+	<a href="{% url 'Portal:add_task' project.id %}"><input type="button" value="Add Task"></a>
+{% endif %}
 
 {% if added_tasks %}
 {% for task in added_tasks %}
 <p></p>
-<h4><b>Task Name:</b></h4><br>
+<b>Task Name:</b>
 <a href="{% url 'Portal:task_description' project.id task.id %}">{{task.task_name}}</a><br>
-<h4><b>Task Description:</b></h4><br>
+<b>Task Description:</b>
 {{task.task_description}}<br>
-<p></p>
 {% endfor %}
 {% endif %}
 
