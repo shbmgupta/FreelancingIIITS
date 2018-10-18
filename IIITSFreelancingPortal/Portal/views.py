@@ -73,8 +73,8 @@ def signup_user(request):
 def home(request):
     if not request.user.is_superuser and request.user.is_authenticated:
         context = dict()
-        cuser = CustomUser.objects.get(user=request.user.id)
-        posted_projects = Project.objects.filter(leader=cuser.id)
+        cuser = CustomUser.objects.get(user=request.user)
+        posted_projects = Project.objects.filter(leader=cuser)
         applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
@@ -211,6 +211,44 @@ def add_task(request, project_id):
 
 
 def task_description(request, project_id, task_id):
+    task = Task.objects.get(id=task_id, project=project_id)
+    context = dict()
+    context['task'] = task
+    context['is_leader']=(task.project.leader.user==request.user)
+    context['applicants']=task.applicant_set.all()
+    context['has_applicants']=bool(len(context['applicants']))
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            if(request.POST["work"]=="apply"):
+                applicant=Applicant()
+                applicant.task=Task.objects.get(id=task_id)#request.POST["task_id"])
+                applicant.user=CustomUser.objects.get(user=request.user.id)
+                applicant.save()
+            elif(request.POST["work"]=="select" and request.user==task.project.leader.user):
+                print("selecting a user")
+                user_id=request.POST["user_id"]
+                is_applicant=False
+                for i in context['applicants']:
+                    if(i.user.user.id==int(user_id)):
+                        is_applicant=True
+                if(is_applicant):
+                    if(len(task.contributor_set.all())==0):
+                        contributor=Contributor()
+                        contributor.user=CustomUser.objects.get(user=int(user_id))
+                        contributor.task=Task.objects.get(id=task_id)
+                        contributor.save()
+                    else:
+                        print("we already have a contributor")
+                else:
+                    print("Not an applicant")
+    context['is_alloted']=bool(len(task.contributor_set.all()))
+    if(context['is_alloted']):
+        context['contributor']=task.contributor_set.get()
+    context['user']=request.user
+    context['has_applied']=False
+    for i in task.applicant_set.all():
+        if(i.user.user==request.user):
+            context['has_applied']=True         
     if request.method == 'POST':
         if request.user.is_authenticated:
             applicant = Applicant()
