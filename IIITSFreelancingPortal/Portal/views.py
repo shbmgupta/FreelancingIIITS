@@ -12,6 +12,7 @@ def index(request):
     else:
         return HttpResponsePermanentRedirect(reverse('Portal:home'))
 
+
 def signup_user(request):
     context = dict()
     if request.method == 'POST':
@@ -81,7 +82,6 @@ def home(request):
         return HttpResponsePermanentRedirect(reverse('Portal:index'))
 
 
-
 def login_user(request):
     if request.method == 'POST':
         username = request.POST['name']
@@ -117,10 +117,15 @@ def context_data(projects, tasks):
     return context
 
 
+def applicable_jobs():
+    projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
+    tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
+    return context_data(projects, tasks)['jobs']
+
+
 def jobs_update(request):
-    skills = request.POST['skills']
-    # languages = request.POST['languages']
-    jobs = request.POST['jobs']
+    skills = request.GET['skills']
+    jobs = applicable_jobs()
     filtered_tasks = []
     for job in jobs:
         tasks = job[1]
@@ -135,9 +140,7 @@ def jobs_update(request):
 
 
 def browse_jobs(request):
-    projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
-    tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
-    context = context_data(projects, tasks)
+    context = applicable_jobs()
     skill_list = Skill.objects.all()
     language_list = CommunicationLanguage.objects.all()
     context['skill_list'] = skill_list
@@ -168,7 +171,7 @@ def project_description(request, project_id):
     context = dict()
     context['project'] = project
     context['added_tasks'] = added_tasks
-    context['is_leader']=(project.leader.user==request.user)
+    context['is_leader'] = (project.leader.user == request.user)
     return render(request, 'projectdescription.html', context)
 
 
@@ -237,4 +240,25 @@ def task_description(request, project_id, task_id):
     for i in task.applicant_set.all():
         if(i.user.user==request.user):
             context['has_applied']=True         
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            applicant = Applicant()
+            applicant.task = Task.objects.get(id=request.POST["task_id"])
+            applicant.user = CustomUser.objects.get(user=request.user.id)
+            applicant.save()
+    task = Task.objects.get(id=task_id, project=project_id)
+    context = dict()
+    context['task'] = task
+    context['is_leader'] = (task.project.leader.user==request.user)
+    context['applicants'] = task.applicant_set.all()
+    # make sure a user does not applies multiple times
+    # make sure that contributor is one of the applicants and only 1 user
+    context['is_alloted'] = bool(len(task.contributor_set.all()))
+    if context['is_alloted']:
+        context['contributor'] = task.contributor_set.get()
+    context['user'] = request.user
+    context['has_applied'] = False
+    for i in task.applicant_set.all():
+        if i.user.user == request.user:
+            context['has_applied'] = True
     return render(request, 'taskdescription.html', context)

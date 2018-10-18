@@ -21,9 +21,8 @@
         text-decoration:none;
         }
 
-
-
     </style>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 </head>
 <body>
 <div class="sides left" style="width:25%">
@@ -43,39 +42,43 @@
             {% endfor %}
         </div>
     </fieldset>
-    <input type="button" value="Filter" onclick="filter()">
-</div>
+    <input type="button" value="Filter" onclick="filter()"/>
 
-<div class="sides right" style="width:70%">
-{% include 'jobs.html' %}
-</div>
+    <script>
 
-<script>
     function filter() {
-        window.alert('filter');
-        break;
-        var skills = $("input[name='skills[]']:checked").map(function () {
-                        return this.value;
-                    }).get();
 
-        var languages = $("input[name='languages[]']:checked").map(function () {
-                        return this.value;
-                    }).get();
+        var skills = []
+        $("input[name='skills[]']:checked").each( function () {
+            skills.push($(this).val());
+        });
 
-        if( skills.length>0 && languages.length>0) {
+        <!--var languages = $("input[name='languages[]']:checked").map(function () {-->
+                        <!--return this.value;-->
+                    <!--}).get();-->
+
+        console.log(skills);
+
+        if( skills.length > 0) {
             $.ajax({
-                type: "POST",
-                url: {% url 'Portal:jobs_update' %},
-                data: {'skills': skills,
-                       'languages': languages,
-                       'jobs': {{jobs}}
-                }
-            })
-            .done(function(data) {
-                $('#jobs').append(data);
-            });
-            }
+                type: "GET",
+                url: "{% url 'Portal:jobs_update' %}",
+                data: {'skills': skills
+                       },
+                success: function(data) {
+                $('#jobs').html(data);
+            }});
         }
-</script>
+    }
+
+
+    </script>
+</div>
+
+<div class="sides right" id="jobs" style="width:70%">
+    {% include 'jobs.html' %}
+</div>
+
+
 </body>
 </html>

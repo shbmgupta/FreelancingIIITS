@@ -6,6 +6,7 @@
         a{
         text-decoration:none;
         }
+
     </style>
 </head>
 <body>
@@ -20,7 +21,7 @@
 <b>Deadline:</b>
 {{project.deadline}}<br>
 {% if is_leader %}
-	<a href="{% url 'Portal:add_task' project.id %}"><input type="button" value="Add Task"></a>
+<a href="{% url 'Portal:add_task' project.id %}"><input type="button" value="Add Task"></a>
 {% endif %}
 
 {% if added_tasks %}
