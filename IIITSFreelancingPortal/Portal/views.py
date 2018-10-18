@@ -110,10 +110,15 @@ def context_data(projects, tasks):
     return context
 
 
+def applicable_jobs():
+    projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
+    tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
+    return context_data(projects, tasks)['jobs']
+
+
 def jobs_update(request):
-    skills = request.POST['skills']
-    # languages = request.POST['languages']
-    jobs = request.POST['jobs']
+    skills = request.GET['skills']
+    jobs = applicable_jobs()
     filtered_tasks = []
     for job in jobs:
         tasks = job[1]
@@ -128,9 +133,7 @@ def jobs_update(request):
 
 
 def browse_jobs(request):
-    projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
-    tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
-    context = context_data(projects, tasks)
+    context = applicable_jobs()
     skill_list = Skill.objects.all()
     language_list = CommunicationLanguage.objects.all()
     context['skill_list'] = skill_list
