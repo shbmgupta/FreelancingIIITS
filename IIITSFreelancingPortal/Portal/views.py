@@ -1,6 +1,9 @@
+import json
+
 from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect,HttpResponse
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponse
 from django.shortcuts import render, reverse, redirect
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 
@@ -113,29 +116,35 @@ def context_data(projects, tasks):
         decontext[key].append(task)
     context['jobs'] = []
     for project in projects:
-        context['jobs'] += [(project, decontext[str(project.id)])]
+        context['jobs'] += [(project, decontext[str(project.id)][0])]
     return context
 
 
 def applicable_jobs():
     projects = Project.objects.filter(isCompleted=False).order_by('-postedOn')
     tasks = Task.objects.filter(isCompleted=False).order_by('-addedOn')
-    return context_data(projects, tasks)['jobs']
+    return context_data(projects, tasks)
 
 
+@csrf_exempt
 def jobs_update(request):
-    skills = request.GET['skills']
-    jobs = applicable_jobs()
+    data = json.loads(request.body)
+    skills = data['skills']
+    decontext = applicable_jobs()
+    jobs = decontext['jobs']
     filtered_tasks = []
+    projects = []
     for job in jobs:
-        tasks = job[1]
-        for task in tasks:
-            taskskreq = TaskSkillsRequired.objects.filter(task=task)
-            skill_list = [Skill.objects.get(id=obj.skill.id).skill_name for obj in taskskreq]
-            flag = sum([skill in skills for skill in skill_list])
-            if flag != 0:
-                filtered_tasks.append(task)
-    context = context_data(jobs[0], filtered_tasks)
+        task = job[1]
+        taskskreq = TaskSkillsRequired.objects.filter(task=task)
+        skill_list = [Skill.objects.get(id=obj.skill.id) for obj in taskskreq]
+        skill_list = [obj.skill_name for obj in skill_list]
+        flag = sum([skill in skills for skill in skill_list])
+        if flag > 0:
+            projects.append(job[0])
+            filtered_tasks.append(task)
+    context = context_data(projects, filtered_tasks)
+    print("asdada")
     return render(request, 'jobs.html', context)
 
 
@@ -211,7 +220,7 @@ def task_description(request, project_id, task_id):
     task = Task.objects.get(id=task_id, project=project_id)
     context = dict()
     context['task'] = task
-    context['is_leader'] = (task.project.leader.user==request.user)
+    context['is_leader'] = (task.project.leader.user == request.user)
     context['applicants'] = task.applicant_set.all()
     # make sure a user does not applies multiple times
     # make sure that contributor is one of the applicants and only 1 user

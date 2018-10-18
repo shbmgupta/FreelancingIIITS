@@ -114,6 +114,7 @@ class Task(models.Model):
     task_description = models.CharField(max_length=100, default=None)
     isCompleted = models.BooleanField(default=False)
     deadline = models.DateField(blank=False)
+
     def __str__(self):
         return self.task_name
 
@@ -195,6 +196,3 @@ class Notification(models.Model):
     message = models.CharField(default=None, max_length=300)
     hasRead = models.BooleanField(default=False)
     receivingTime = models.DateTimeField(default=datetime.datetime.now(), blank=False)
-
-
-

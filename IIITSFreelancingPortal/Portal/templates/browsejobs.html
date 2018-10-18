@@ -21,8 +21,9 @@
         text-decoration:none;
         }
 
+
+
     </style>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 </head>
 <body>
 <div class="sides left" style="width:25%">
@@ -43,8 +44,14 @@
         </div>
     </fieldset>
     <input type="button" value="Filter" onclick="filter()"/>
+</div>
 
-    <script>
+<div class="sides right" id="jobs" style="width:70%">
+    {% include 'jobs.html' %}
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
 
     function filter() {
 
@@ -57,27 +64,23 @@
                         <!--return this.value;-->
                     <!--}).get();-->
 
-        console.log(skills);
-
         if( skills.length > 0) {
+
             $.ajax({
-                type: "GET",
+                type: "POST",
                 url: "{% url 'Portal:jobs_update' %}",
-                data: {'skills': skills
-                       },
-                success: function(data) {
-                $('#jobs').html(data);
-            }});
+                contentType: "application/json",
+                data: JSON.stringify({'skills': skills}),
+                success: function(data){
+                         $("#jobs").html(data);
+                }
+            });
         }
     }
 
 
-    </script>
-</div>
 
-<div class="sides right" id="jobs" style="width:70%">
-    {% include 'jobs.html' %}
-</div>
+</script>
 
 
 </body>

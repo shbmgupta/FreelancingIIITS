@@ -2,12 +2,10 @@
 {% for job in jobs %}
 <fieldset>
     <legend>{{job.0.project_name}}</legend>
-    {% for task in job.1 %}
     <h4><b>Task Name:</b></h4>
-    <a href="{% url 'Portal:task_description' job.0.id task.id %}">{{task.task_name}}</a>
+    <a href="{% url 'Portal:task_description' job.0.id job.1.id %}">{{job.1.task_name}}</a>
     <h4><b>Added on:</b></h4>
-    {{task.addedOn}}
-    {% endfor %}
+    {{job.1.addedOn}}
 </fieldset>
 <br>
 {% endfor %}
