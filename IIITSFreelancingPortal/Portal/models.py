@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+
 # Create your models here.
 
 Beginner = Good = 1
@@ -56,7 +57,7 @@ class CustomUser(models.Model):
 
 
 class Skill(models.Model):
-    skill_name = models.CharField(max_length=20, blank=False, unique=True)
+    skill_name = models.CharField(max_length=50, blank=False, unique=True)
 
     def __str__(self):
         return self.skill_name
@@ -75,7 +76,7 @@ class UsersSkill(models.Model):
 
 
 class CommunicationLanguage(models.Model):
-    language_name = models.CharField(max_length=20, blank=False, unique=True)
+    language_name = models.CharField(max_length=30, blank=False, unique=True)
 
     def __str__(self):
         return self.language_name
@@ -94,8 +95,8 @@ class UsersCommunicationLanguage(models.Model):
 
 
 class Project(models.Model):
-    project_name = models.CharField(max_length=30, blank=False)
-    description = models.CharField(max_length=100, default=None)
+    project_name = models.CharField(max_length=100, blank=False)
+    description = models.CharField(max_length=300, default=None)
     postedOn = models.DateTimeField(default=datetime.datetime.now(), blank=False)
     leader = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     isCompleted = models.BooleanField(default=False)
@@ -107,10 +108,12 @@ class Project(models.Model):
 
 
 class Task(models.Model):
-    task_name = models.CharField(max_length=30, blank=False)
+    task_name = models.CharField(max_length=50, blank=False)
     addedOn = models.DateTimeField(default=datetime.datetime.now(), blank=False)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    credits = models.CharField(max_length=20, blank=False)
+    credits = models.CharField(max_length=20, choices=(("Paid", "Paid"), ("Other", "Other")), blank=False,
+                               default="Paid")
+    amount = models.IntegerField(default=0)
     task_description = models.CharField(max_length=100, default=None)
     isCompleted = models.BooleanField(default=False)
     deadline = models.DateField(blank=False)
@@ -125,6 +128,18 @@ class TaskSkillsRequired(models.Model):
     proficiency_level_required = models.IntegerField(
         default=Beginner,
         choices=proficiency_level_choices,
+    )
+
+    def __str__(self):
+        return str(self.task.task_name) + '[id=' + str(self.task.id) + ']'
+
+
+class TaskLanguagesRequired(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    language = models.ForeignKey(CommunicationLanguage, on_delete=models.CASCADE)
+    proficiency_level_required = models.IntegerField(
+        default=Good,
+        choices=fluency_level_choices,
     )
 
     def __str__(self):

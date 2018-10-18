@@ -3,6 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Task</title>
+    <style>
+        .sides{
+        margin:0;
+        }
+        .left{
+        float:left;
+        width:35%;
+        overflow:hidden;
+        }
+        .right{
+        float:left;
+        width:35%;
+        overflow:hidden;
+        }
+
+    </style>
 </head>
 <body>
 <form method="post" action="{% url 'Portal:add_task' project_id %}">
@@ -12,14 +28,39 @@
     Description
     <textarea name="desc" required></textarea><br>
     Credits
-    <input name="credit" required><br>
+    <select name="credits" onchange="Display(this);">
+        <option value="Paid" selected>Paid</option>
+        <option value="Other">Other</option>
+    </select><br>
+    <div id="show" style="display: block;">
+        <label for="amt">Amount:</label>
+        <input type="number" min="0" value="0" id="amt" name="amount"/><br/>
+    </div>
     Deadline
     <input name="deadline" type="date" required><br>
-    Skills Required<br>
-    {% for skill in skill_list %}
-    {{skill.skill_name}}<input type="checkbox" name="skills[]" value="{{skill.skill_name}}"><br>
-    {% endfor %}
+    <div class="sides left">
+        Skills Required<br>
+        {% for skill in skill_list %}
+        {{skill.skill_name}}<input type="checkbox" name="skills[]" value="{{skill.skill_name}}"><br>
+        {% endfor %}
+    </div>
+    <div class="sides right">
+        Languages Required<br>
+        {% for language in language_list %}
+        {{language.language_name}}<input type="checkbox" name="language[]" value="{{language.language_name}}"><br>
+        {% endfor %}
+    </div>
     <input type="submit" value="ADD">
 </form>
+<script>
+    function Display(that) {
+        if (that.value == "Other") {
+            document.getElementById("show").style.display = "none";
+        } else {
+            document.getElementById("show").style.display = "block";
+        }
+    }
+
+</script>
 </body>
 </html>

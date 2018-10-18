@@ -130,21 +130,34 @@ def applicable_jobs():
 def jobs_update(request):
     data = json.loads(request.body)
     skills = data['skills']
+    languages = data['languages']
     decontext = applicable_jobs()
-    jobs = decontext['jobs']
-    filtered_tasks = []
-    projects = []
-    for job in jobs:
-        task = job[1]
-        taskskreq = TaskSkillsRequired.objects.filter(task=task)
-        skill_list = [Skill.objects.get(id=obj.skill.id) for obj in taskskreq]
-        skill_list = [obj.skill_name for obj in skill_list]
-        flag = sum([skill in skills for skill in skill_list])
-        if flag > 0:
-            projects.append(job[0])
-            filtered_tasks.append(task)
-    context = context_data(projects, filtered_tasks)
-    print("asdada")
+    if len(skills) > 0 or len(languages) > 0:
+        jobs = decontext['jobs']
+        filtered_tasks = set()
+        projects = set()
+        for job in jobs:
+            task = job[1]
+            if len(skills) > 0:
+                taskskreq = TaskSkillsRequired.objects.filter(task=task)
+                skill_list = [Skill.objects.get(id=obj.skill.id) for obj in taskskreq]
+                skill_list = [obj.skill_name for obj in skill_list]
+                flag_skills = sum([skill in skills for skill in skill_list])
+                if flag_skills > 0:
+                    projects.add(job[0])
+                    filtered_tasks.add(task)
+            if len(languages) > 0:
+                tasklgreq = TaskLanguagesRequired.objects.filter(task=task)
+                language_list = [CommunicationLanguage.objects.get(id=obj.language.id) for obj in tasklgreq]
+                language_list = [obj.language_name for obj in language_list]
+                flag_languages = sum([language in languages for language in language_list])
+                if flag_languages > 0:
+                    projects.add(job[0])
+                    filtered_tasks.add(task)
+        context = context_data(projects, filtered_tasks)
+        print(filtered_tasks)
+    else:
+        context = decontext
     return render(request, 'jobs.html', context)
 
 
@@ -192,8 +205,10 @@ def add_task(request, project_id):
             task.task_name = request.POST['name']
             task.task_description = request.POST['desc']
             task.credits = request.POST['credit']
+            task.amount = request.POST['amount']
             task.deadline = request.POST['deadline']
             skills = request.POST.getlist('skills')
+            languages = request.POST.getlist('languages')
             task.project = Project.objects.get(id=project_id)
             task.save()
             for rskill in skills:
@@ -202,11 +217,19 @@ def add_task(request, project_id):
                 task_skill_req.task = task
                 task_skill_req.skill = skill
                 task_skill_req.save()
+            for rlanguage in languages:
+                language = CommunicationLanguage.objects.get(language_name=rlanguage)
+                task_language_req = TaskLanguagesRequired()
+                task_language_req.task = task
+                task_language_req.skill = language
+                task_language_req.save()
             return redirect('Portal:project_description', project_id)
         return render(request, 'login.html')
     context['project_id'] = project_id
     skill_list = Skill.objects.all()
+    language_list = CommunicationLanguage.objects.all()
     context['skill_list'] = skill_list
+    context['language_list'] = language_list
     return render(request, "addtask.html", context)
 
 
@@ -214,41 +237,41 @@ def task_description(request, project_id, task_id):
     task = Task.objects.get(id=task_id, project=project_id)
     context = dict()
     context['task'] = task
-    context['is_leader']=(task.project.leader.user==request.user)
-    context['applicants']=task.applicant_set.all()
-    context['has_applicants']=bool(len(context['applicants']))
+    context['is_leader'] = (task.project.leader.user == request.user)
+    context['applicants'] = task.applicant_set.all()
+    context['has_applicants'] = bool(len(context['applicants']))
     if request.method == 'POST':
         if request.user.is_authenticated:
-            if(request.POST["work"]=="apply"):
-                applicant=Applicant()
-                applicant.task=Task.objects.get(id=task_id)#request.POST["task_id"])
-                applicant.user=CustomUser.objects.get(user=request.user.id)
+            if request.POST["work"] == "apply":
+                applicant = Applicant()
+                applicant.task = Task.objects.get(id=task_id)
+                applicant.user = CustomUser.objects.get(user=request.user.id)
                 applicant.save()
-            elif(request.POST["work"]=="select" and request.user==task.project.leader.user):
+            elif request.POST["work"] == "select" and request.user == task.project.leader.user:
                 print("selecting a user")
-                user_id=request.POST["user_id"]
-                is_applicant=False
+                user_id = request.POST["user_id"]
+                is_applicant = False
                 for i in context['applicants']:
-                    if(i.user.user.id==int(user_id)):
-                        is_applicant=True
-                if(is_applicant):
-                    if(len(task.contributor_set.all())==0):
-                        contributor=Contributor()
-                        contributor.user=CustomUser.objects.get(user=int(user_id))
-                        contributor.task=Task.objects.get(id=task_id)
+                    if i.user.user.id == int(user_id):
+                        is_applicant = True
+                if is_applicant:
+                    if len(task.contributor_set.all()) == 0:
+                        contributor = Contributor()
+                        contributor.user = CustomUser.objects.get(user=int(user_id))
+                        contributor.task = Task.objects.get(id=task_id)
                         contributor.save()
                     else:
                         print("we already have a contributor")
                 else:
                     print("Not an applicant")
-    context['is_alloted']=bool(len(task.contributor_set.all()))
-    if(context['is_alloted']):
-        context['contributor']=task.contributor_set.get()
-    context['user']=request.user
-    context['has_applied']=False
+    context['is_alloted'] = bool(len(task.contributor_set.all()))
+    if context['is_alloted']:
+        context['contributor'] = task.contributor_set.get()
+    context['user'] = request.user
+    context['has_applied'] = False
     for i in task.applicant_set.all():
-        if(i.user.user==request.user):
-            context['has_applied']=True         
+        if i.user.user == request.user:
+            context['has_applied'] = True
     if request.method == 'POST':
         if request.user.is_authenticated:
             applicant = Applicant()

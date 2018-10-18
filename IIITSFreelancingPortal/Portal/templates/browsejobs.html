@@ -60,22 +60,19 @@
             skills.push($(this).val());
         });
 
-        <!--var languages = $("input[name='languages[]']:checked").map(function () {-->
-                        <!--return this.value;-->
-                    <!--}).get();-->
-
-        if( skills.length > 0) {
+        var languages = $("input[name='languages[]']:checked").map(function () {
+                        return this.value;
+                    }).get();
 
             $.ajax({
                 type: "POST",
                 url: "{% url 'Portal:jobs_update' %}",
                 contentType: "application/json",
-                data: JSON.stringify({'skills': skills}),
+                data: JSON.stringify({'skills': skills, 'languages': languages}),
                 success: function(data){
                          $("#jobs").html(data);
                 }
             });
-        }
     }
 
 
