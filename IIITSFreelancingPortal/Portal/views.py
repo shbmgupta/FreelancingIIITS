@@ -1,5 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect,HttpResponse
 from django.shortcuts import render, reverse, redirect
 
 from .models import *
@@ -7,7 +7,10 @@ from .models import *
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if not request.user.is_authenticated:
+        return render(request, 'index.html')
+    else:
+        return HttpResponsePermanentRedirect(reverse('Portal:home'))
 
 
 def signup_user(request):
@@ -73,6 +76,10 @@ def home(request):
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
         return render(request, 'home.html', context)
+    elif request.user.is_superuser:
+        return HttpResponse("Super User is Logged in....")
+    else:
+        return HttpResponsePermanentRedirect(reverse('Portal:index'))
 
 
 def login_user(request):
@@ -164,6 +171,7 @@ def project_description(request, project_id):
     context = dict()
     context['project'] = project
     context['added_tasks'] = added_tasks
+    context['is_leader'] = (project.leader.user == request.user)
     return render(request, 'projectdescription.html', context)
 
 
@@ -194,7 +202,25 @@ def add_task(request, project_id):
 
 
 def task_description(request, project_id, task_id):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            applicant = Applicant()
+            applicant.task = Task.objects.get(id=request.POST["task_id"])
+            applicant.user = CustomUser.objects.get(user=request.user.id)
+            applicant.save()
     task = Task.objects.get(id=task_id, project=project_id)
     context = dict()
     context['task'] = task
+    context['is_leader'] = (task.project.leader.user==request.user)
+    context['applicants'] = task.applicant_set.all()
+    # make sure a user does not applies multiple times
+    # make sure that contributor is one of the applicants and only 1 user
+    context['is_alloted'] = bool(len(task.contributor_set.all()))
+    if context['is_alloted']:
+        context['contributor'] = task.contributor_set.get()
+    context['user'] = request.user
+    context['has_applied'] = False
+    for i in task.applicant_set.all():
+        if i.user.user == request.user:
+            context['has_applied'] = True
     return render(request, 'taskdescription.html', context)

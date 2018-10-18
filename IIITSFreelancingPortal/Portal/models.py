@@ -114,7 +114,6 @@ class Task(models.Model):
     task_description = models.CharField(max_length=100, default=None)
     isCompleted = models.BooleanField(default=False)
     deadline = models.DateField(blank=False)
-
     def __str__(self):
         return self.task_name
 
