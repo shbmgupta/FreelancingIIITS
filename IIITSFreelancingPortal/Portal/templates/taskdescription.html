@@ -22,14 +22,26 @@
 	<b>Contributor:-</b><br>
 	{{contributor.user.user.username}}<br/>
 {% else %}
-	{% if has_applied %}
-		You have already applied for he task
-	{% else %}
-		<b>Open For Applicants</b>
-		{% if not is_leader %}
+	{% if is_leader  %}
+		{% if has_applicants %}
+			<form method="POST" action="{%url 'Portal:task_description' task.project.id task.id %}">
+				{%csrf_token%}
+				<input type="hidden" name="work" value="select">
+				{% for i in applicants %}
+					<input type="radio" name="user_id" value="{{i.user.user.id}}">{{i.user.user.username}}<br>
+				{% endfor %}
+				<input type="submit" name="submit" value="select">
+			</form>
+		{% endif %}
+	{% else%}
+		{% if has_applied %}
+			You have already applied for he task
+		{% else %}
+			<b>Open For Applicants</b>
 			<form method="POST" action="{% url 'Portal:task_description' task.project.id task.id %}">
 				{% csrf_token %}
-				<input type="hidden" name="task_id" value="{{task.id}}">
+				<input type="hidden" name="work" value="apply">
+				<!--< input type="hidden" name="task_id" value="{{task.id}}"> -->
 				<input type="submit" name="submit" value="Apply for the task"> 			
 			</form>
 		{% endif %}
