@@ -20,9 +20,6 @@
         a{
         text-decoration:none;
         }
-
-
-
     </style>
 </head>
 <body>
@@ -53,6 +50,9 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
 
+    var cachedSkills = [];
+    var cachedLanguages = [];
+
     function filter() {
 
         var skills = []
@@ -64,6 +64,8 @@
                         return this.value;
                     }).get();
 
+        if (!arraysEqual(cachedSkills, skills) || !arraysEqual(cachedLanguages, languages)){
+
             $.ajax({
                 type: "POST",
                 url: "{% url 'Portal:jobs_update' %}",
@@ -73,9 +75,23 @@
                          $("#jobs").html(data);
                 }
             });
+
+        }
+
+        cachedSkills = skills;
+        cachedLanguages = languages;
     }
 
+    function arraysEqual(arr1, arr2) {
+        if(arr1.length !== arr2.length)
+            return false;
+        for(var i = arr1.length; i--;) {
+            if(arr1[i] !== arr2[i])
+                return false;
+        }
 
+        return true;
+    }
 
 </script>
 
