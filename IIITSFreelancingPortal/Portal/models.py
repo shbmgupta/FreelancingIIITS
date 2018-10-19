@@ -206,8 +206,9 @@ class UserRating(models.Model):
 
 
 class Notification(models.Model):
-    _from = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    _to = models.ForeignKey(CustomUser, related_name='_from', on_delete=models.CASCADE)
+    _from = models.ForeignKey(CustomUser, related_name="msgfrom",on_delete=models.CASCADE)
+    _to = models.ForeignKey(CustomUser, related_name='msgto', on_delete=models.CASCADE)
     message = models.CharField(default=None, max_length=300)
-    hasRead = models.BooleanField(default=False)
-    receivingTime = models.DateTimeField(default=datetime.datetime.now(), blank=False)
+    has_read = models.BooleanField(default=False)
+    sending_time = models.DateTimeField(default=datetime.datetime.now(), blank=False)
+    recieving_time=models.DateTimeField(default=None,blank=True,null=True)
