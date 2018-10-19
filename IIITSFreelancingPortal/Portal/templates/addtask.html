@@ -32,10 +32,15 @@
         <option value="Paid" selected>Paid</option>
         <option value="Other">Other</option>
     </select><br>
-    <div id="show" style="display: block;">
-        <label for="amt">Amount:</label>
-        <input type="number" min="0" value="0" id="amt" name="amount"/><br/>
+    <div id="show1" style="display: block;">
+        <label for="amt1">Amount:</label>
+        <input type="number" min="0" value="0" id="amt1" name="amount"/><br/>
     </div>
+    <!-- <div id="show2" style="display: none;">
+        <label for="amt2">Oth:</label>
+        <input type="text" placeholder="credit here" id="amt2" name="amount2"/><br/>
+    </div>
+     -->
     Deadline
     <input name="deadline" type="date" required><br>
     <div class="sides left">
@@ -55,9 +60,12 @@
 <script>
     function Display(that) {
         if (that.value == "Other") {
-            document.getElementById("show").style.display = "none";
+            document.getElementById("show1").style.display = "none";
+            // document.getElementById("show2").style.display = "block";
         } else {
-            document.getElementById("show").style.display = "block";
+            document.getElementById("show1").style.display = "block";
+            // document.getElementById("show2").style.display = "none";
+            
         }
     }
 

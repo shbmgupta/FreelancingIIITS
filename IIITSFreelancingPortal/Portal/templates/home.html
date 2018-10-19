@@ -61,5 +61,11 @@ Welcome {{request.user.username}}<br>
     {% endif %}
 </div>
 
+<h3>Notifications</h3>
+{% for i in notifications %}
+    {{i.message}}<br>
+    {{i.sending_time}}<br>
+    ----------------------<br>
+{% endfor %}
 </body>
 </html>

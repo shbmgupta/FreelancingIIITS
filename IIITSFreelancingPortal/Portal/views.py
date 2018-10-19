@@ -4,7 +4,6 @@ from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponse
 from django.shortcuts import render, reverse, redirect
 from django.views.decorators.csrf import csrf_exempt
-
 from .models import *
 
 
@@ -78,6 +77,8 @@ def home(request):
         applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
+        context['notifications']=cuser.msgto.all()
+        print(context['notifications'])
         return render(request, 'home.html', context)
     elif request.user.is_superuser:
         return HttpResponse("Super User is Logged in....")
@@ -204,8 +205,9 @@ def add_task(request, project_id):
             task = Task()
             task.task_name = request.POST['name']
             task.task_description = request.POST['desc']
-            task.credits = request.POST['credit']
+            task.credits = request.POST['credits']
             task.amount = request.POST['amount']
+            # print(task.amount)
             task.deadline = request.POST['deadline']
             skills = request.POST.getlist('skills')
             languages = request.POST.getlist('languages')
@@ -243,10 +245,16 @@ def task_description(request, project_id, task_id):
     if request.method == 'POST':
         if request.user.is_authenticated:
             if request.POST["work"] == "apply":
-                applicant = Applicant()
-                applicant.task = Task.objects.get(id=task_id)
-                applicant.user = CustomUser.objects.get(user=request.user.id)
-                applicant.save()
+                #check if the user is already an 
+                context['has_applied'] = False
+                for i in task.applicant_set.all():
+                    if i.user.user == request.user:
+                        context['has_applied'] = True
+                if(not context['has_applied']):
+                    applicant = Applicant()
+                    applicant.task = Task.objects.get(id=task_id)
+                    applicant.user = CustomUser.objects.get(user=request.user.id)
+                    applicant.save()
             elif request.POST["work"] == "select" and request.user == task.project.leader.user:
                 print("selecting a user")
                 user_id = request.POST["user_id"]
@@ -260,6 +268,13 @@ def task_description(request, project_id, task_id):
                         contributor.user = CustomUser.objects.get(user=int(user_id))
                         contributor.task = Task.objects.get(id=task_id)
                         contributor.save()
+                        notification=Notification()
+                        notification._from=CustomUser.objects.get(user=int(request.user.id))
+                        notification._to=CustomUser.objects.get(user=int(user_id))
+                        notification.message="You have been selected for the task "+str(contributor.task.task_name)
+                        # print("selected a user")
+                        # print(notification)
+                        notification.save()
                     else:
                         print("we already have a contributor")
                 else:
@@ -268,21 +283,15 @@ def task_description(request, project_id, task_id):
     if context['is_alloted']:
         context['contributor'] = task.contributor_set.get()
     context['user'] = request.user
-    context['has_applied'] = False
-    for i in task.applicant_set.all():
-        if i.user.user == request.user:
-            context['has_applied'] = True
-    if request.method == 'POST':
-        if request.user.is_authenticated:
-            applicant = Applicant()
-            applicant.task = Task.objects.get(id=request.POST["task_id"])
-            applicant.user = CustomUser.objects.get(user=request.user.id)
-            applicant.save()
+    # if request.method == 'POST':
+    #     if request.user.is_authenticated:
+    #         applicant = Applicant()
+    #         applicant.task = Task.objects.get(id=request.POST["task_id"])
+    #         applicant.user = CustomUser.objects.get(user=request.user.id)
+    #         applicant.save()
     task = Task.objects.get(id=task_id, project=project_id)
-    context = dict()
     context['task'] = task
-    context['is_leader'] = (task.project.leader.user == request.user)
-    context['applicants'] = task.applicant_set.all()
+    # context['applicants'] = task.applicant_set.all()
     # make sure a user does not applies multiple times
     # make sure that contributor is one of the applicants and only 1 user
     context['is_alloted'] = bool(len(task.contributor_set.all()))
