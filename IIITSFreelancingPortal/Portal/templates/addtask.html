@@ -36,11 +36,6 @@
         <label for="amt1">Amount:</label>
         <input type="number" min="0" value="0" id="amt1" name="amount"/><br/>
     </div>
-    <!-- <div id="show2" style="display: none;">
-        <label for="amt2">Oth:</label>
-        <input type="text" placeholder="credit here" id="amt2" name="amount2"/><br/>
-    </div>
-     -->
     Deadline
     <input name="deadline" type="date" required><br>
     <div class="sides left">
@@ -61,11 +56,8 @@
     function Display(that) {
         if (that.value == "Other") {
             document.getElementById("show1").style.display = "none";
-            // document.getElementById("show2").style.display = "block";
         } else {
             document.getElementById("show1").style.display = "block";
-            // document.getElementById("show2").style.display = "none";
-            
         }
     }
 

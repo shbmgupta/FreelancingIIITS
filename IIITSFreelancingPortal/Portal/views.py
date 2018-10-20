@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, Htt
 from django.shortcuts import render, reverse, redirect
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
+from django.contrib.auth.models import User
 
 
 # Create your views here.
@@ -25,14 +26,19 @@ def signup_user(request):
         password = request.POST['passwd']
         phone_number = request.POST['phno']
         bio = request.POST['bio']
-        image = request.FILES['image']
+        image = request.POST['image']
         batchYear = request.POST['batch']
         gender = request.POST['gender']
-        skills = request.POST.getlist('skills')
-        languages = request.POST.getlist('languages')
+        skills = request.POST.getlist('skills[]')
+        print(skills)
+        languages = request.POST.getlist('languages[]')
         try:
             if User.objects.get(email=email):
                 context = dict()
+                skill_list = Skill.objects.all()
+                language_list = CommunicationLanguage.objects.all()
+                context['skill_list'] = skill_list
+                context['language_list'] = language_list
                 context['error_message'] = 'User already exists'
                 return render(request, 'signup.html', context)
         except User.DoesNotExist:
@@ -49,7 +55,7 @@ def signup_user(request):
                 cuskill = UsersSkill()
                 cuskill.skill = skill
                 cuskill.user = cuser
-                cuskill.level_of_proficiency = request.POST[skill.skill_name]
+                cuskill.level_of_proficiency = int(request.POST[skill.skill_name])
                 cuskill.save()
             for ulanguage in languages:
                 language = CommunicationLanguage.objects.get(language_name=ulanguage)
@@ -58,10 +64,10 @@ def signup_user(request):
                 culanguage = UsersCommunicationLanguage()
                 culanguage.language = language
                 culanguage.user = cuser
-                culanguage.level_of_fluency = request.POST[language.language_name]
+                culanguage.level_of_fluency = int(request.POST[language.language_name])
                 culanguage.save()
             login(request, user)
-            return request(request, 'home.html')
+            return render(request, 'home.html')
     skill_list = Skill.objects.all()
     language_list = CommunicationLanguage.objects.all()
     context['skill_list'] = skill_list
@@ -77,7 +83,7 @@ def home(request):
         applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
-        context['notifications']=cuser.msgto.all()
+        context['notifications'] = cuser.msgto.all()
         print(context['notifications'])
         return render(request, 'home.html', context)
     elif request.user.is_superuser:
@@ -156,7 +162,6 @@ def jobs_update(request):
                     projects.add(job[0])
                     filtered_tasks.add(task)
         context = context_data(projects, filtered_tasks)
-        print(filtered_tasks)
     else:
         context = decontext
     return render(request, 'jobs.html', context)
@@ -207,12 +212,14 @@ def add_task(request, project_id):
             task.task_description = request.POST['desc']
             task.credits = request.POST['credits']
             task.amount = request.POST['amount']
-            # print(task.amount)
             task.deadline = request.POST['deadline']
-            skills = request.POST.getlist('skills')
-            languages = request.POST.getlist('languages')
+            skills = request.POST.getlist('skills[]')
+            languages = request.POST.getlist('languages[]')
             task.project = Project.objects.get(id=project_id)
             task.save()
+            project = Project.objects.get(id=task.project.id)
+            project.task_count += 1
+            project.save()
             for rskill in skills:
                 skill = Skill.objects.get(skill_name=rskill)
                 task_skill_req = TaskSkillsRequired()
@@ -245,7 +252,7 @@ def task_description(request, project_id, task_id):
     if request.method == 'POST':
         if request.user.is_authenticated:
             if request.POST["work"] == "apply":
-                #check if the user is already an 
+                # check if the user is already an
                 context['has_applied'] = False
                 for i in task.applicant_set.all():
                     if i.user.user == request.user:

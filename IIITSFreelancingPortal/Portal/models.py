@@ -50,7 +50,7 @@ class CustomUser(models.Model):
         ("None", "None"), ("UG-1", "UG-1"), ("UG-2", "UG-2"), ("UG-3", "UG-3"), ("UG-4", "UG-4"), ("MS", "MS"),
         ("Ph.D", "Ph.D")), default='None')
     # gender
-    gender = models.CharField(max_length=1, choices=(("M", "Male"), ("F", "Female")), blank=False)
+    gender = models.CharField(max_length=1, choices=(("Male", "Male"), ("Female", "Female")), default="Male", blank=False)
 
     def __str__(self):
         return self.user.username
@@ -211,4 +211,4 @@ class Notification(models.Model):
     message = models.CharField(default=None, max_length=300)
     has_read = models.BooleanField(default=False)
     sending_time = models.DateTimeField(default=datetime.datetime.now(), blank=False)
-    recieving_time=models.DateTimeField(default=None,blank=True,null=True)
+    recieving_time = models.DateTimeField(default=None, blank=True, null=True)

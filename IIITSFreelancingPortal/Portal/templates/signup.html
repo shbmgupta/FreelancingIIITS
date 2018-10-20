@@ -24,7 +24,7 @@
 {% if error_message %}
 <b>{{error_message}}</b><br>
 {% endif %}
-<form method="post" action="{% url 'Portal:signup' %}" enctype="multipart/form-data">
+<form method="post">
     {% csrf_token %}
 
     Username:
@@ -43,7 +43,7 @@
     <input type="password" name="passwd" minlength="8" required><br>
 
     Phone Number:
-    <input type="number" min="0" name="phno" minlength="10" maxlength="10" required><br>
+    <input type="tel" min="0" name="phno" minlength="10" maxlength="11" required><br>
 
     Bio:
     <textarea name="bio" required></textarea><br>
@@ -81,9 +81,9 @@
         Proficiency:<br>
         {% for skill in skill_list %}
         <select name="{{skill.skill_name}}">
-            <option value="Beginner" selected>Beginner</option>&emsp;
-            <option value="Intermediate">Intermediate</option>&emsp;
-            <option value="Advanced">Advanced</option>
+            <option value="1" selected>Beginner</option>&emsp;
+            <option value="2">Intermediate</option>&emsp;
+            <option value="3">Advanced</option>
         </select><br>
         {% endfor %}
 
@@ -91,10 +91,10 @@
 
         Fluency:<br>
         {% for language in language_list %}
-        <select name="{{skill.skill_name}}">
-            <option value="Good" selected>Good</option>&emsp;
-            <option value="VeryGood">VeryGood</option>&emsp;
-            <option value="Excellent">Excellent</option>
+        <select name="{{language.language_name}}">
+            <option value="1" selected>Good</option>&emsp;
+            <option value="2">VeryGood</option>&emsp;
+            <option value="3">Excellent</option>
         </select><br>
         {% endfor %}
     </div>
