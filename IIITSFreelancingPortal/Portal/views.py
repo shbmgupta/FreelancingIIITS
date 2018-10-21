@@ -18,6 +18,10 @@ def index(request):
 
 def signup_user(request):
     context = dict()
+    skill_list = Skill.objects.all()    
+    language_list = CommunicationLanguage.objects.all()
+    context['skill_list'] = skill_list
+    context['language_list'] = language_list
     if request.method == 'POST':
         username = request.POST['name']
         first_name = request.POST['fname']
@@ -34,18 +38,10 @@ def signup_user(request):
         # print(skills)
         languages = request.POST.getlist('languages[]')
         if(password1!=password2):
-            skill_list = Skill.objects.all()
-            language_list = CommunicationLanguage.objects.all()
             context['passwd_msg']="The 2 passwords mentioned by you are not same"
-            context['skill_list'] = skill_list
-            context['language_list'] = language_list
             return render(request, 'signup.html', context)
         try:
             if User.objects.get(email=email):
-                skill_list = Skill.objects.all()
-                language_list = CommunicationLanguage.objects.all()
-                context['skill_list'] = skill_list
-                context['language_list'] = language_list
                 context['error_message'] = 'User already exists'
                 return render(request, 'signup.html', context)
         except User.DoesNotExist:
@@ -74,11 +70,9 @@ def signup_user(request):
                 culanguage.level_of_fluency = int(request.POST[language.language_name])
                 culanguage.save()
             login(request, user)
-            return render(request, 'home.html')
-    skill_list = Skill.objects.all()
-    language_list = CommunicationLanguage.objects.all()
-    context['skill_list'] = skill_list
-    context['language_list'] = language_list
+            print("<<--------->>\n",context)
+            return HttpResponsePermanentRedirect(reverse("Portal:home"))
+
     return render(request, 'signup.html', context)
 
 
@@ -88,6 +82,10 @@ def home(request):
         cuser = CustomUser.objects.get(user=request.user)
         posted_projects = Project.objects.filter(leader=cuser)
         applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
+        contributor=Contributor.objects.filter(user=cuser)#.task
+        # contribute_project_task=[]
+        # for i in contributor:
+        #     contribute_project_task.append(i.task)
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
         context['notifications'] = cuser.msgto.all()
