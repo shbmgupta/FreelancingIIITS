@@ -83,13 +83,14 @@ def home(request):
         posted_projects = Project.objects.filter(leader=cuser)
         applicable_projects = Project.objects.exclude(isCompleted=True).exclude(leader=cuser.id)
         contributor=Contributor.objects.filter(user=cuser)#.task
-        # contribute_project_task=[]
-        # for i in contributor:
-        #     contribute_project_task.append(i.task)
+        contribute_project_task=[]
+        for i in contributor:
+            contribute_project_task.append((i.task.task_name,i.task.project.project_name))
+        context['contribute_project_task']=contribute_project_task
         context['posted_projects'] = posted_projects
         context['applicable_projects'] = applicable_projects
         context['notifications'] = cuser.msgto.all()
-        print(context['notifications'])
+        print(context['contribute_project_task'])
         return render(request, 'home.html', context)
     elif request.user.is_superuser:
         return HttpResponse("Super User is Logged in....")
@@ -191,9 +192,7 @@ def post_project(request):
             project.deadline = request.POST['deadline']
             project.save()
             posted_projects = Project.objects.filter(leader=project.leader)
-            context = dict()
-            context['posted_projects'] = posted_projects
-            return render(request, 'home.html', context)
+            return HttpResponsePermanentRedirect(reverse('Portal:home'))
         return render(request, 'login.html')
     return render(request, "postproject.html")
 
