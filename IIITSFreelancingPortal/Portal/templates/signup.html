@@ -40,7 +40,14 @@
     <input type="email" name="email" required><br>
 
     Password:
-    <input type="password" name="passwd" minlength="8" required><br>
+    <input type="password" name="passwd1" minlength="8" required><br>
+
+    Re-Enter your password:-
+    <input type="password" name="passwd2" minlength="8" required><br>
+
+    {% if passwd_msg %}
+        {{passwd_msg}}<br>
+    {% endif %}
 
     Phone Number:
     <input type="tel" min="0" name="phno" minlength="10" maxlength="11" required><br>

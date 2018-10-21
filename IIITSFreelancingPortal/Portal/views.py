@@ -23,18 +23,25 @@ def signup_user(request):
         first_name = request.POST['fname']
         last_name = request.POST['lname']
         email = request.POST['email']
-        password = request.POST['passwd']
+        password1 = request.POST['passwd1']
+        password2=request.POST['passwd2']
         phone_number = request.POST['phno']
         bio = request.POST['bio']
         image = request.POST['image']
         batchYear = request.POST['batch']
         gender = request.POST['gender']
         skills = request.POST.getlist('skills[]')
-        print(skills)
+        # print(skills)
         languages = request.POST.getlist('languages[]')
+        if(password1!=password2):
+            skill_list = Skill.objects.all()
+            language_list = CommunicationLanguage.objects.all()
+            context['passwd_msg']="The 2 passwords mentioned by you are not same"
+            context['skill_list'] = skill_list
+            context['language_list'] = language_list
+            return render(request, 'signup.html', context)
         try:
             if User.objects.get(email=email):
-                context = dict()
                 skill_list = Skill.objects.all()
                 language_list = CommunicationLanguage.objects.all()
                 context['skill_list'] = skill_list
@@ -43,7 +50,7 @@ def signup_user(request):
                 return render(request, 'signup.html', context)
         except User.DoesNotExist:
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email,
-                                            password=password)
+                                            password=password1)
             cuser = CustomUser(user=user, phone_number=phone_number, image=image, bio=bio, batchYear=batchYear,
                                gender=gender)
             user.save()
