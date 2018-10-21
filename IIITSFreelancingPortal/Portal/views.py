@@ -255,7 +255,15 @@ def task_description(request, project_id, task_id):
     context['has_applicants'] = bool(len(context['applicants']))
     if request.method == 'POST':
         if request.user.is_authenticated:
-            if request.POST["work"] == "apply":
+            if request.POST["work"]=="status_update":
+                if(request.POST["status_update"]=="open"):
+                    task.isCompleted=False
+                elif(request.POST["status_update"]=="close"):
+                    task.isCompleted=True
+                else:
+                    print("some error in task_description")
+                task.save()
+            elif request.POST["work"] == "apply":
                 # check if the user is already an
                 context['has_applied'] = False
                 for i in task.applicant_set.all():
@@ -310,7 +318,9 @@ def task_description(request, project_id, task_id):
         context['contributor'] = task.contributor_set.get()
     context['user'] = request.user
     context['has_applied'] = False
+    context['is_completed']=task.isCompleted
     for i in task.applicant_set.all():
         if i.user.user == request.user:
             context['has_applied'] = True
     return render(request, 'taskdescription.html', context)
+

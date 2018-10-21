@@ -6,8 +6,7 @@
 </head>
 <body>
 {{is_leader}}<br>
-{{has_applicants}}<br>
-{{is_alloted}}<br>
+{{is_completed}}<br>
 ----------------------------<br>
 <b>Task Name:</b><br>
 {{task.task_name}}<br>
@@ -25,8 +24,18 @@
 {% if is_alloted %}
 	<b>Contributor:-</b><br>
 	{{contributor.user.user.username}}<br/>
+	<b>Is Completed:-</b>{{ is_completed }}<br>
 {% else %}
 	{% if is_leader  %}
+		<form method="POST" action="{%url 'Portal:task_description' task.project.id task.id %}">
+			{%csrf_token%}
+			<input type="hidden" name="work" value="status_update">
+			{% if is_completed %}
+				<input type="submit" name="status_update" value="open">
+			{% else %}
+				<input type="submit" name="status_update" value="close">
+			{% endif %}
+		</form>
 		{% if has_applicants %}
 			<form method="POST" action="{%url 'Portal:task_description' task.project.id task.id %}">
 				{%csrf_token%}
